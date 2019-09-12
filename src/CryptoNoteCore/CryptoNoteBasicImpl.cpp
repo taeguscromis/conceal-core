@@ -52,7 +52,8 @@ namespace CryptoNote {
   //-----------------------------------------------------------------------
   std::string getAccountAddressAsStr(uint64_t prefix, const AccountPublicAddress& adr) {
     BinaryArray ba;
-    bool r = toBinaryArray(adr, ba);
+    bool r = false;
+    r = toBinaryArray(adr, ba);
     assert(r);
     return Tools::Base58::encode_addr(prefix, Common::asString(ba));
   }

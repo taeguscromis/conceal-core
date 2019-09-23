@@ -9,7 +9,7 @@
 #include <time.h>
 #include <boost/foreach.hpp>
 #include <System/Ipv4Address.h>
-
+#include <iostream>
 #include "Serialization/SerializationOverloads.h"
 
 using namespace CryptoNote;
@@ -222,7 +222,8 @@ bool PeerlistManager::append_with_peer_white(const PeerlistEntry& ple)
       m_peers_gray.erase(by_addr_it_gr);
     }
     return true;
-  } catch (std::exception&) {
+  } catch (std::exception& e) {
+      std::cerr << "Exception: " << e.what() << std::endl;
       return false;
   }
   return false;
@@ -253,7 +254,8 @@ bool PeerlistManager::append_with_peer_gray(const PeerlistEntry& ple)
       m_peers_gray.replace(by_addr_it_gr, ple);
     }
     return true;
-  } catch (std::exception&) {
+  } catch (std::exception& e) {
+      std::cerr << "Exception: " << e.what() << std::endl;
       return false;
   }
   return false;

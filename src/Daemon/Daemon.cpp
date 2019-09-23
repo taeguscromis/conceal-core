@@ -11,7 +11,7 @@
 #include <boost/program_options.hpp>
 
 #include "DaemonCommandsHandler.h"
-
+#include <iostream>
 #include "Common/SignalHandler.h"
 #include "Common/PathTools.h"
 #include "crypto/hash.h"
@@ -263,7 +263,8 @@ int main(int argc, char* argv[])
 
     try {
       currencyBuilder.currency();
-    } catch (std::exception&) {
+    } catch (std::exception& e) {
+      std::cerr << "Exception: " << e.what() << std::endl;
       std::cout << "GENESIS_COINBASE_TX_HEX constant has an incorrect value. Please launch: " << CryptoNote::CRYPTONOTE_NAME << "d --" << arg_print_genesis_tx.name;
       return 1;
     }

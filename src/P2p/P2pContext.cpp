@@ -10,7 +10,7 @@
 #include <System/InterruptedException.h>
 #include <System/Ipv4Address.h>
 #include <System/OperationTimeout.h>
-
+#include <iostream>
 #include "LevinProtocol.h"
 
 using namespace System;
@@ -153,7 +153,8 @@ void P2pContext::timedSyncLoop() {
       }
     } catch (InterruptedException&) {
       // someone stopped us
-    } catch (std::exception&) {
+    } catch (std::exception& e) {
+      std::cerr << "Exception: " << e.what() << std::endl;
       stop(); // stop connection on write error
       break;
     }

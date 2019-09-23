@@ -91,7 +91,8 @@ bool loadFromJson(T& v, const std::string& buf) {
     }
     auto js = Common::JsonValue::fromString(buf);
     loadFromJsonValue(v, js);
-  } catch (std::exception&) {
+  } catch (std::exception& e) {
+    std::cerr << "Exception: " << e.what() << std::endl;
     return false;
   }
   return true;
@@ -115,7 +116,8 @@ bool loadFromBinaryKeyValue(T& v, const std::string& buf) {
     KVBinaryInputStreamSerializer s(stream);
     serialize(v, s);
     return true;
-  } catch (std::exception&) {
+  } catch (std::exception& e) {
+    std::cerr << "Exception: " << e.what() << std::endl;
     return false;
   }
 }

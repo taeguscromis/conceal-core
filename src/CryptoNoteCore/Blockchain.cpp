@@ -7,7 +7,7 @@
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include "Blockchain.h"
-
+#include <iostream>
 #include <algorithm>
 #include <numeric>
 #include <cstdio>
@@ -150,7 +150,8 @@ public:
       StdOutputStream stream(file);
       BinaryOutputStreamSerializer s(stream);
       CryptoNote::serialize(*this, s);
-    } catch (std::exception&) {
+    } catch (std::exception& e) {
+      std::cerr << "Exception: " << e.what() << std::endl;
       return false;
     }
 

@@ -30,8 +30,9 @@ std::error_code walletSaveWrapper(CryptoNote::IWalletLegacy& wallet, std::ofstre
     wallet.addObserver(&o);
     wallet.save(file, saveDetailes, saveCache);
     e = f.get();
-  } catch (std::exception&) {
+  } catch (std::exception& e) {    
     wallet.removeObserver(&o);
+    std::cerr << "Exception: " << e.what() << std::endl;
     return make_error_code(std::errc::invalid_argument);
   }
 
@@ -104,10 +105,11 @@ void WalletHelper::storeWallet(CryptoNote::IWalletLegacy& wallet, const std::str
   std::ofstream file;
   try {
     openOutputFileStream(walletFilename, file);
-  } catch (std::exception&) {
+  } catch (std::exception& e) {
     if (boost::filesystem::exists(tempFile)) {
       boost::filesystem::rename(tempFile, walletFilename);
     }
+    std::cerr << "Exception: " << e.what() << std::endl;
     throw;
   }
 

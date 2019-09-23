@@ -50,7 +50,8 @@ bool storeToBinaryFile(const T& obj, const std::string& filename) {
     }
 
     dataFile.flush();
-  } catch (std::exception&) {
+  } catch (std::exception& e) {
+    std::cerr << "Exception: " << e.what() << std::endl;
     return false;
   }
 
@@ -70,7 +71,8 @@ bool loadFromBinaryFile(T& obj, const std::string& filename) {
     BinaryInputStreamSerializer in(stream);
     serialize(obj, in);
     return !dataFile.fail();
-  } catch (std::exception&) {
+  } catch (std::exception& e) {
+    std::cerr << "Exception: " << e.what() << std::endl;
     return false;
   }
 }

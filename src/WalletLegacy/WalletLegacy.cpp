@@ -15,7 +15,7 @@
 #include <numeric>
 #include <string.h>
 #include <time.h>
-
+#include <iostream>
 #include "crypto/crypto.h"
 #include "Common/Base58.h"
 #include "Common/ShuffleGenerator.h"
@@ -284,8 +284,10 @@ void WalletLegacy::doLoad(std::istream& source) {
   } catch (std::system_error& e) {
     runAtomic(m_cacheMutex, [this] () {this->m_state = WalletLegacy::NOT_INITIALIZED;} );
     m_observerManager.notify(&IWalletLegacyObserver::initCompleted, e.code());
+    std::cerr << "Exception: " << e.what() << std::endl;
     return;
-  } catch (std::exception&) {
+  } catch (std::exception& e) {
+    std::cerr << "Exception: " << e.what() << std::endl;
     runAtomic(m_cacheMutex, [this] () {this->m_state = WalletLegacy::NOT_INITIALIZED;} );
     m_observerManager.notify(&IWalletLegacyObserver::initCompleted, make_error_code(CryptoNote::error::INTERNAL_WALLET_ERROR));
     return;

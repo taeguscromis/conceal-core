@@ -4,6 +4,7 @@
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
+#include <iostream>
 #include "CryptoNoteTools.h"
 #include "CryptoNoteFormatUtils.h"
 
@@ -15,7 +16,8 @@ bool toBinaryArray(const BinaryArray& object, BinaryArray& binaryArray) {
     BinaryOutputStreamSerializer serializer(stream);
     std::string oldBlob = Common::asString(object);
     serializer(oldBlob, "");
-  } catch (std::exception&) {
+  } catch (std::exception& e) {
+    std::cerr << "Exception: " << e.what() << std::endl;
     return false;
   }
 

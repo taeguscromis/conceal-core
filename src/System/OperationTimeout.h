@@ -20,7 +20,8 @@ public:
       try {
         timeoutTimer.sleep(timeout);
         timerContext.interrupt();
-      } catch (std::exception&) {
+      } catch (std::exception& e) {
+        std::cerr << "Exception: " << e.what() << std::endl;
       }
     });
   }

@@ -397,9 +397,10 @@ void secureSaveWallet(CryptoNote::IWallet& wallet, const std::string& path, bool
 
   try {
     saveWallet(wallet, tempFile, saveDetailed, saveCache);
-  } catch (std::exception&) {
+  } catch (std::exception& e) {
     deleteFile(tempFilePath);
     tempFile.close();
+    std::cerr << "Exception: " << e.what() << std::endl;
     throw;
   }
   tempFile.close();

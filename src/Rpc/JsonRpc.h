@@ -71,7 +71,8 @@ public:
   bool parseRequest(const std::string& requestBody) {
     try {
       psReq = Common::JsonValue::fromString(requestBody);
-    } catch (std::exception&) {
+    } catch (std::exception& e) {
+      std::cerr << "Exception: " << e.what() << std::endl;
       throw JsonRpcError(errParseError);
     }
 
@@ -135,7 +136,8 @@ public:
   void parse(const std::string& responseBody) {
     try {
       psResp = Common::JsonValue::fromString(responseBody);
-    } catch (std::exception&) {
+    } catch (std::exception& e) {
+      std::cerr << "Exception: " << e.what() << std::endl;
       throw JsonRpcError(errParseError);
     }
   }

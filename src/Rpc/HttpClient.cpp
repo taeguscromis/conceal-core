@@ -16,7 +16,7 @@
 // along with Karbo.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "HttpClient.h"
-
+#include <iostream>
 #include <HTTP/HttpParser.h>
 #include <System/Ipv4Resolver.h>
 #include <System/Ipv4Address.h>
@@ -70,13 +70,15 @@ void HttpClient::disconnect() {
   m_streamBuf.reset();
   try {
     m_connection.write(nullptr, 0); //Socket shutdown.
-  } catch (std::exception&) {
+  } catch (std::exception& e) {
+    std::cerr << "Exception: " << e.what() << std::endl;
     //Ignoring possible exception.
   }
 
   try {
     m_connection = System::TcpConnection();
-  } catch (std::exception&) {
+  } catch (std::exception& e) {
+    std::cerr << "Exception: " << e.what() << std::endl;
     //Ignoring possible exception.
   }
 

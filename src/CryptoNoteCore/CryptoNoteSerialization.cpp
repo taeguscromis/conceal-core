@@ -29,57 +29,67 @@
 
 using namespace Common;
 
-namespace {
+namespace
+{
 
 using namespace CryptoNote;
 using namespace Common;
 
-size_t getSignaturesCount(const TransactionInput& input) {
-  struct txin_signature_size_visitor : public boost::static_visitor < size_t > {
-    size_t operator()(const BaseInput& txin) const { return 0; }
-    size_t operator()(const KeyInput& txin) const { return txin.outputIndexes.size(); }
-    size_t operator()(const MultisignatureInput& txin) const { return txin.signatureCount; }
+size_t getSignaturesCount(const TransactionInput &input)
+{
+  struct txin_signature_size_visitor : public boost::static_visitor<size_t>
+  {
+    size_t operator()(const BaseInput &txin) const { return 0; }
+    size_t operator()(const KeyInput &txin) const { return txin.outputIndexes.size(); }
+    size_t operator()(const MultisignatureInput &txin) const { return txin.signatureCount; }
   };
 
   return boost::apply_visitor(txin_signature_size_visitor(), input);
 }
 
-struct BinaryVariantTagGetter: boost::static_visitor<uint8_t> {
-  uint8_t operator()(const CryptoNote::BaseInput) { return  0xff; }
-  uint8_t operator()(const CryptoNote::KeyInput) { return  0x2; }
-  uint8_t operator()(const CryptoNote::MultisignatureInput) { return  0x3; }
-  uint8_t operator()(const CryptoNote::KeyOutput) { return  0x2; }
-  uint8_t operator()(const CryptoNote::MultisignatureOutput) { return  0x3; }
-  uint8_t operator()(const CryptoNote::Transaction) { return  0xcc; }
-  uint8_t operator()(const CryptoNote::Block) { return  0xbb; }
+struct BinaryVariantTagGetter : boost::static_visitor<uint8_t>
+{
+  uint8_t operator()(const CryptoNote::BaseInput) { return 0xff; }
+  uint8_t operator()(const CryptoNote::KeyInput) { return 0x2; }
+  uint8_t operator()(const CryptoNote::MultisignatureInput) { return 0x3; }
+  uint8_t operator()(const CryptoNote::KeyOutput) { return 0x2; }
+  uint8_t operator()(const CryptoNote::MultisignatureOutput) { return 0x3; }
+  uint8_t operator()(const CryptoNote::Transaction) { return 0xcc; }
+  uint8_t operator()(const CryptoNote::Block) { return 0xbb; }
 };
 
-struct VariantSerializer : boost::static_visitor<> {
-  VariantSerializer(CryptoNote::ISerializer& serializer, const std::string& name) : s(serializer), name(name) {}
+struct VariantSerializer : boost::static_visitor<>
+{
+  VariantSerializer(CryptoNote::ISerializer &serializer, const std::string &name) : s(serializer), name(name) {}
 
   template <typename T>
-  void operator() (T& param) { s(param, name); }
+  void operator()(T &param) { s(param, name); }
 
-  CryptoNote::ISerializer& s;
+  CryptoNote::ISerializer &s;
   std::string name;
 };
 
-void getVariantValue(CryptoNote::ISerializer& serializer, uint8_t tag, CryptoNote::TransactionInput& in) {
-  switch(tag) {
-  case 0xff: {
-    CryptoNote::BaseInput v;
-    serializer(v, "value");
-    in = v;
-    break;
-  }
-  case 0x2: {
+void getVariantValue(CryptoNote::ISerializer &serializer, uint8_t tag, CryptoNote::TransactionInput &in)
+{
+  switch (tag)
+  {
+  case 0x2:
+  {
     CryptoNote::KeyInput v;
     serializer(v, "value");
     in = v;
     break;
   }
-  case 0x3: {
+  case 0x3:
+  {
     CryptoNote::MultisignatureInput v;
+    serializer(v, "value");
+    in = v;
+    break;
+  }
+  case 0xff:
+  {
+    CryptoNote::BaseInput v;
     serializer(v, "value");
     in = v;
     break;
@@ -89,15 +99,19 @@ void getVariantValue(CryptoNote::ISerializer& serializer, uint8_t tag, CryptoNot
   }
 }
 
-void getVariantValue(CryptoNote::ISerializer& serializer, uint8_t tag, CryptoNote::TransactionOutputTarget& out) {
-  switch(tag) {
-  case 0x2: {
+void getVariantValue(CryptoNote::ISerializer &serializer, uint8_t tag, CryptoNote::TransactionOutputTarget &out)
+{
+  switch (tag)
+  {
+  case 0x2:
+  {
     CryptoNote::KeyOutput v;
     serializer(v, "data");
     out = v;
     break;
   }
-  case 0x3: {
+  case 0x3:
+  {
     CryptoNote::MultisignatureOutput v;
     serializer(v, "data");
     out = v;
@@ -109,21 +123,25 @@ void getVariantValue(CryptoNote::ISerializer& serializer, uint8_t tag, CryptoNot
 }
 
 template <typename T>
-bool serializePod(T& v, Common::StringView name, CryptoNote::ISerializer& serializer) {
+bool serializePod(T &v, Common::StringView name, CryptoNote::ISerializer &serializer)
+{
   return serializer.binary(&v, sizeof(v), name);
 }
 
-bool serializeVarintVector(std::vector<uint32_t>& vector, CryptoNote::ISerializer& serializer, Common::StringView name) {
+bool serializeVarintVector(std::vector<uint32_t> &vector, CryptoNote::ISerializer &serializer, Common::StringView name)
+{
   size_t size = vector.size();
-  
-  if (!serializer.beginArray(size, name)) {
+
+  if (!serializer.beginArray(size, name))
+  {
     vector.clear();
     return false;
   }
 
   vector.resize(size);
 
-  for (size_t i = 0; i < size; ++i) {
+  for (size_t i = 0; i < size; ++i)
+  {
     serializer(vector[i], "");
   }
 
@@ -131,50 +149,62 @@ bool serializeVarintVector(std::vector<uint32_t>& vector, CryptoNote::ISerialize
   return true;
 }
 
-}
+} // namespace
 
-namespace Crypto {
+namespace Crypto
+{
 
-bool serialize(PublicKey& pubKey, Common::StringView name, CryptoNote::ISerializer& serializer) {
+bool serialize(PublicKey &pubKey, Common::StringView name, CryptoNote::ISerializer &serializer)
+{
   return serializePod(pubKey, name, serializer);
 }
 
-bool serialize(SecretKey& secKey, Common::StringView name, CryptoNote::ISerializer& serializer) {
+bool serialize(SecretKey &secKey, Common::StringView name, CryptoNote::ISerializer &serializer)
+{
   return serializePod(secKey, name, serializer);
 }
 
-bool serialize(Hash& h, Common::StringView name, CryptoNote::ISerializer& serializer) {
+bool serialize(Hash &h, Common::StringView name, CryptoNote::ISerializer &serializer)
+{
   return serializePod(h, name, serializer);
 }
 
-bool serialize(KeyImage& keyImage, Common::StringView name, CryptoNote::ISerializer& serializer) {
+bool serialize(KeyImage &keyImage, Common::StringView name, CryptoNote::ISerializer &serializer)
+{
   return serializePod(keyImage, name, serializer);
 }
 
-bool serialize(chacha_iv& chacha, Common::StringView name, CryptoNote::ISerializer& serializer) {
+bool serialize(chacha_iv &chacha, Common::StringView name, CryptoNote::ISerializer &serializer)
+{
   return serializePod(chacha, name, serializer);
 }
 
-bool serialize(Signature& sig, Common::StringView name, CryptoNote::ISerializer& serializer) {
+bool serialize(Signature &sig, Common::StringView name, CryptoNote::ISerializer &serializer)
+{
   return serializePod(sig, name, serializer);
 }
 
-bool serialize(EllipticCurveScalar& ecScalar, Common::StringView name, CryptoNote::ISerializer& serializer) {
+bool serialize(EllipticCurveScalar &ecScalar, Common::StringView name, CryptoNote::ISerializer &serializer)
+{
   return serializePod(ecScalar, name, serializer);
 }
 
-bool serialize(EllipticCurvePoint& ecPoint, Common::StringView name, CryptoNote::ISerializer& serializer) {
+bool serialize(EllipticCurvePoint &ecPoint, Common::StringView name, CryptoNote::ISerializer &serializer)
+{
   return serializePod(ecPoint, name, serializer);
 }
 
-}
+} // namespace Crypto
 
-namespace CryptoNote {
+namespace CryptoNote
+{
 
-void serialize(TransactionPrefix& txP, ISerializer& serializer) {
+void serialize(TransactionPrefix &txP, ISerializer &serializer)
+{
   serializer(txP.version, "version");
 
-  if (TRANSACTION_VERSION_2 < txP.version) {
+  if (TRANSACTION_VERSION_2 < txP.version)
+  {
     throw std::runtime_error("Wrong transaction version");
   }
 
@@ -184,100 +214,123 @@ void serialize(TransactionPrefix& txP, ISerializer& serializer) {
   serializeAsBinary(txP.extra, "extra", serializer);
 }
 
-void serialize(Transaction& tx, ISerializer& serializer) {
-  serialize(static_cast<TransactionPrefix&>(tx), serializer);
+void serialize(Transaction &tx, ISerializer &serializer)
+{
+  serialize(static_cast<TransactionPrefix &>(tx), serializer);
 
   size_t sigSize = tx.inputs.size();
   //TODO: make arrays without sizes
-//  serializer.beginArray(sigSize, "signatures");
-  
-  if (serializer.type() == ISerializer::INPUT) {
+  //  serializer.beginArray(sigSize, "signatures");
+
+  if (serializer.type() == ISerializer::INPUT)
+  {
     tx.signatures.resize(sigSize);
   }
 
   bool signaturesNotExpected = tx.signatures.empty();
-  if (!signaturesNotExpected && tx.inputs.size() != tx.signatures.size()) {
+  if (!signaturesNotExpected && tx.inputs.size() != tx.signatures.size())
+  {
     throw std::runtime_error("Serialization error: unexpected signatures size");
   }
 
-  for (size_t i = 0; i < tx.inputs.size(); ++i) {
+  for (size_t i = 0; i < tx.inputs.size(); ++i)
+  {
     size_t signatureSize = getSignaturesCount(tx.inputs[i]);
-    if (signaturesNotExpected) {
-      if (signatureSize == 0) {
+    if (signaturesNotExpected)
+    {
+      if (signatureSize == 0)
+      {
         continue;
-      } else {
+      }
+      else
+      {
         throw std::runtime_error("Serialization error: signatures are not expected");
       }
     }
 
-    if (serializer.type() == ISerializer::OUTPUT) {
-      if (signatureSize != tx.signatures[i].size()) {
+    if (serializer.type() == ISerializer::OUTPUT)
+    {
+      if (signatureSize != tx.signatures[i].size())
+      {
         throw std::runtime_error("Serialization error: unexpected signatures size");
       }
 
-      for (Crypto::Signature& sig : tx.signatures[i]) {
+      for (Crypto::Signature &sig : tx.signatures[i])
+      {
         serializePod(sig, "", serializer);
       }
-
-    } else {
+    }
+    else
+    {
       std::vector<Crypto::Signature> signatures(signatureSize);
-      for (Crypto::Signature& sig : signatures) {
+      for (Crypto::Signature &sig : signatures)
+      {
         serializePod(sig, "", serializer);
       }
 
       tx.signatures[i] = std::move(signatures);
     }
   }
-//  serializer.endArray();
+  //  serializer.endArray();
 }
 
-void serialize(TransactionInput& in, ISerializer& serializer) {
-  if (serializer.type() == ISerializer::OUTPUT) {
+void serialize(TransactionInput &in, ISerializer &serializer)
+{
+  if (serializer.type() == ISerializer::OUTPUT)
+  {
     BinaryVariantTagGetter tagGetter;
     uint8_t tag = boost::apply_visitor(tagGetter, in);
     serializer.binary(&tag, sizeof(tag), "type");
-
     VariantSerializer visitor(serializer, "value");
     boost::apply_visitor(visitor, in);
-  } else {
+  }
+  else
+  {
     uint8_t tag;
     serializer.binary(&tag, sizeof(tag), "type");
-
     getVariantValue(serializer, tag, in);
   }
 }
 
-void serialize(BaseInput& gen, ISerializer& serializer) {
+void serialize(BaseInput &gen, ISerializer &serializer)
+{
   serializer(gen.blockIndex, "height");
 }
 
-void serialize(KeyInput& key, ISerializer& serializer) {
+void serialize(KeyInput &key, ISerializer &serializer)
+{
   serializer(key.amount, "amount");
   serializeVarintVector(key.outputIndexes, serializer, "key_offsets");
   serializer(key.keyImage, "k_image");
 }
 
-void serialize(MultisignatureInput& multisignature, ISerializer& serializer) {
+void serialize(MultisignatureInput &multisignature, ISerializer &serializer)
+{
   serializer(multisignature.amount, "amount");
   serializer(multisignature.signatureCount, "signatures");
   serializer(multisignature.outputIndex, "outputIndex");
   serializer(multisignature.term, "term");
 }
 
-void serialize(TransactionOutput& output, ISerializer& serializer) {
+void serialize(TransactionOutput &output, ISerializer &serializer)
+{
   serializer(output.amount, "amount");
   serializer(output.target, "target");
 }
 
-void serialize(TransactionOutputTarget& output, ISerializer& serializer) {
-  if (serializer.type() == ISerializer::OUTPUT) {
+void serialize(TransactionOutputTarget &output, ISerializer &serializer)
+{
+  if (serializer.type() == ISerializer::OUTPUT)
+  {
     BinaryVariantTagGetter tagGetter;
     uint8_t tag = boost::apply_visitor(tagGetter, output);
     serializer.binary(&tag, sizeof(tag), "type");
 
     VariantSerializer visitor(serializer, "data");
     boost::apply_visitor(visitor, output);
-  } else {
+  }
+  else
+  {
     uint8_t tag;
     serializer.binary(&tag, sizeof(tag), "type");
 
@@ -285,19 +338,23 @@ void serialize(TransactionOutputTarget& output, ISerializer& serializer) {
   }
 }
 
-void serialize(KeyOutput& key, ISerializer& serializer) {
+void serialize(KeyOutput &key, ISerializer &serializer)
+{
   serializer(key.key, "key");
 }
 
-void serialize(MultisignatureOutput& multisignature, ISerializer& serializer) {
+void serialize(MultisignatureOutput &multisignature, ISerializer &serializer)
+{
   serializer(multisignature.keys, "keys");
   serializer(multisignature.requiredSignatureCount, "required_signatures");
   serializer(multisignature.term, "term");
 }
 
-void serializeBlockHeader(BlockHeader& header, ISerializer& serializer) {
+void serializeBlockHeader(BlockHeader &header, ISerializer &serializer)
+{
   serializer(header.majorVersion, "major_version");
-  if (header.majorVersion > BLOCK_MAJOR_VERSION_7) {
+  if (header.majorVersion > BLOCK_MAJOR_VERSION_7)
+  {
     throw std::runtime_error("Wrong major version");
   }
 
@@ -307,43 +364,52 @@ void serializeBlockHeader(BlockHeader& header, ISerializer& serializer) {
   serializer.binary(&header.nonce, sizeof(header.nonce), "nonce");
 }
 
-void serialize(BlockHeader& header, ISerializer& serializer) {
+void serialize(BlockHeader &header, ISerializer &serializer)
+{
   serializeBlockHeader(header, serializer);
 }
 
-void serialize(Block& block, ISerializer& serializer) {
+void serialize(Block &block, ISerializer &serializer)
+{
   serializeBlockHeader(block, serializer);
 
   serializer(block.baseTransaction, "miner_tx");
   serializer(block.transactionHashes, "tx_hashes");
 }
 
-void serialize(AccountPublicAddress& address, ISerializer& serializer) {
+void serialize(AccountPublicAddress &address, ISerializer &serializer)
+{
   serializer(address.spendPublicKey, "m_spend_public_key");
   serializer(address.viewPublicKey, "m_view_public_key");
 }
 
-void serialize(AccountKeys& keys, ISerializer& s) {
+void serialize(AccountKeys &keys, ISerializer &s)
+{
   s(keys.address, "m_account_address");
   s(keys.spendSecretKey, "m_spend_secret_key");
   s(keys.viewSecretKey, "m_view_secret_key");
 }
 
-void doSerialize(TransactionExtraMergeMiningTag& tag, ISerializer& serializer) {
+void doSerialize(TransactionExtraMergeMiningTag &tag, ISerializer &serializer)
+{
   uint64_t depth = static_cast<uint64_t>(tag.depth);
   serializer(depth, "depth");
   tag.depth = static_cast<size_t>(depth);
   serializer(tag.merkleRoot, "merkle_root");
 }
 
-void serialize(TransactionExtraMergeMiningTag& tag, ISerializer& serializer) {
-  if (serializer.type() == ISerializer::OUTPUT) {
+void serialize(TransactionExtraMergeMiningTag &tag, ISerializer &serializer)
+{
+  if (serializer.type() == ISerializer::OUTPUT)
+  {
     std::string field;
     StringOutputStream os(field);
     BinaryOutputStreamSerializer output(os);
     doSerialize(tag, output);
     serializer(field, "");
-  } else {
+  }
+  else
+  {
     std::string field;
     serializer(field, "");
     MemoryInputStream stream(field.data(), field.size());
@@ -352,10 +418,10 @@ void serialize(TransactionExtraMergeMiningTag& tag, ISerializer& serializer) {
   }
 }
 
-void serialize(KeyPair& keyPair, ISerializer& serializer) {
+void serialize(KeyPair &keyPair, ISerializer &serializer)
+{
   serializer(keyPair.secretKey, "secret_key");
   serializer(keyPair.publicKey, "public_key");
 }
-
 
 } //namespace CryptoNote

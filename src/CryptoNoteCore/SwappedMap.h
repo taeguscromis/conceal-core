@@ -262,7 +262,8 @@ template<class Key, class T> std::pair<typename SwappedMap<Key, T>::const_iterat
     try {
       boost::archive::binary_oarchive archive(m_itemsFile);
       archive & value.second;
-    } catch (std::exception&) {
+    } catch (std::exception& e) {
+      std::cerr << "Exception: " << e.what() << std::endl;
       throw std::runtime_error("SwappedMap::insert");
     }
 
@@ -352,7 +353,8 @@ template<class Key, class T> const std::pair<const Key, T>* SwappedMap<Key, T>::
   try {
     boost::archive::binary_iarchive archive(m_itemsFile);
     archive & tempItem;
-  } catch (std::exception&) {
+  } catch (std::exception& e) {
+    std::cerr << "Exception: " << e.what() << std::endl;
     throw std::runtime_error("SwappedMap::load");
   }
 

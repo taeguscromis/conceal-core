@@ -14,7 +14,7 @@
 #include <set>
 #include <tuple>
 #include <utility>
-
+#include <iostream>
 #include <System/EventLock.h>
 #include <System/RemoteContext.h>
 
@@ -565,6 +565,7 @@ std::vector<std::string> WalletGreen::doCreateAddressList(const std::vector<NewA
   } catch (const std::exception& e) {
     //m_logger(ERROR, BRIGHT_RED) << "Failed to add wallets: " << e.what();
     startBlockchainSynchronizer();
+    std::cerr << "Exception: " << e.what() << std::endl;     
     throw;
   }
 
@@ -593,7 +594,8 @@ std::string WalletGreen::doCreateAddress(const Crypto::PublicKey& spendPublicKey
       shutdown();
       load(ss, password);
     }
-  } catch (std::exception&) {
+  } catch (std::exception& e) {
+    std::cerr << "Exception: " << e.what() << std::endl;
     startBlockchainSynchronizer();
     throw;
   }

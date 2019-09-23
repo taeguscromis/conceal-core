@@ -41,7 +41,8 @@ private:
       try {
         CryptoNote::JsonInputValueSerializer inputSerializer(const_cast<Common::JsonValue&>(jsonRpcParams));
         serialize(request, inputSerializer);
-      } catch (std::exception&) {
+      } catch (std::exception& e) {
+        std::cerr << "Exception: " << e.what() << std::endl;
         makeGenericErrorReponse(jsonResponse, "Invalid Request", -32600);
         return;
       }

@@ -361,9 +361,10 @@ void BlockchainSynchronizer::startBlockchainSync() {
         processBlocks(response);
       }
     }
-  } catch (std::exception&) {
+  } catch (std::exception& e) {
     setFutureStateIf(State::idle,  [this] { return m_futureState != State::stopped; });
     m_observerManager.notify(&IBlockchainSynchronizerObserver::synchronizationCompleted, std::make_error_code(std::errc::invalid_argument));
+    std::cerr << "Exception: " << e.what() << std::endl;
   }
 }
 
@@ -388,9 +389,10 @@ void BlockchainSynchronizer::processBlocks(GetBlocksResponse& response) {
         for (const auto& txShortInfo : block.txsShortInfo) {
           completeBlock.transactions.push_back(createTransactionPrefix(txShortInfo.txPrefix, reinterpret_cast<const Hash&>(txShortInfo.txId)));
         }
-      } catch (std::exception&) {
+      } catch (std::exception& e) {
         setFutureStateIf(State::idle, [this] { return m_futureState != State::stopped; });
         m_observerManager.notify(&IBlockchainSynchronizerObserver::synchronizationCompleted, std::make_error_code(std::errc::invalid_argument));
+        std::cerr << "Exception: " << e.what() << std::endl;
         return;
       }
     }

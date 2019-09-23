@@ -46,7 +46,8 @@ std::streambuf::int_type TcpStreambuf::underflow() {
   size_t bytesRead;
   try {
     bytesRead = connection.read(reinterpret_cast<uint8_t*>(&readBuf.front()), readBuf.max_size());
-  } catch (std::exception&) {
+  } catch (std::exception& e) {
+    std::cerr << "Exception: " << e.what() << std::endl;
     return traits_type::eof();
   }
 
@@ -85,7 +86,8 @@ bool TcpStreambuf::dumpBuffer(bool finalize) {
         pbump(-static_cast<int>(count));
       }
     }
-  } catch (std::exception&) {
+   } catch (std::exception& e) {
+     std::cerr << "Exception: " << e.what() << std::endl;
     return false;
   }
 

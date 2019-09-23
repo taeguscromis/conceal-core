@@ -256,8 +256,8 @@ void ConsoleHandler::handlerThread() {
         handleCommand(line);
       }
 
-    } catch (std::exception&) {
-      // ignore errors
+    } catch (std::exception& e) {
+      std::cerr << "Exception: " << e.what() << std::endl;
     }
   }
 }

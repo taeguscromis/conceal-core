@@ -5,7 +5,7 @@
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include "SynchronizationState.h"
-
+#include <iostream>
 #include "Common/StdInputStream.h"
 #include "Common/StdOutputStream.h"
 #include "Serialization/BinaryInputStreamSerializer.h"

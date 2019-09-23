@@ -5,7 +5,7 @@
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #pragma once
-
+#include <iostream>
 #include <limits>
 #include "Common/MemoryInputStream.h"
 #include "Common/StringTools.h"
@@ -25,7 +25,8 @@ bool toBinaryArray(const T& object, BinaryArray& binaryArray) {
     ::Common::VectorOutputStream stream(binaryArray);
     BinaryOutputStreamSerializer serializer(stream);
     serialize(const_cast<T&>(object), serializer);
-  } catch (std::exception&) {
+  } catch (std::exception& e) {
+    std::cerr << "Exception: " << e.what() << std::endl;    
     return false;
   }
 
@@ -50,7 +51,8 @@ bool fromBinaryArray(T& object, const BinaryArray& binaryArray) {
     BinaryInputStreamSerializer serializer(stream);
     serialize(object, serializer);
     result = stream.endOfStream(); // check that all data was consumed
-  } catch (std::exception&) {
+  } catch (std::exception& e) {
+    std::cerr << "Exception: " << e.what() << std::endl;    
     return result;
   }
 

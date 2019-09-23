@@ -75,7 +75,8 @@ public:
       Common::MemoryInputStream stream(buf.data(), buf.size());
       KVBinaryInputStreamSerializer serializer(stream);
       serialize(value, serializer);
-    } catch (std::exception&) {
+    } catch (std::exception& e) {
+      std::cerr << "Exception: " << e.what() << std::endl;
       return false;
     }
 

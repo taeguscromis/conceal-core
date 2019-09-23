@@ -45,7 +45,8 @@ void parseDaemonAddress(const std::string& daemonAddress, std::string& daemonHos
 
   try {
     daemonPort = boost::lexical_cast<uint16_t>(splittedAddress[1]);
-  } catch (std::exception&) {
+  } catch (std::exception& e) {
+    std::cerr << "Exception: " << e.what() << std::endl;
     throw std::runtime_error("Wrong daemon address format");
   }
 }

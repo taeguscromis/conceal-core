@@ -19,7 +19,7 @@
 
 #include "HttpServer.h"
 #include <boost/scope_exit.hpp>
-
+#include <iostream>
 #include <Common/Base64.h>
 #include <HTTP/HttpParser.h>
 #include <System/InterruptedException.h>
@@ -69,7 +69,8 @@ void HttpServer::acceptLoop() {
         accepted = true;
       } catch (System::InterruptedException&) {
         throw;
-      } catch (std::exception&) {
+      } catch (std::exception& e) {
+        std::cerr << "Exception: " << e.what() << std::endl;
         // try again
       }
     }

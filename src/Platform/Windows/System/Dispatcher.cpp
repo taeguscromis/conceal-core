@@ -388,7 +388,8 @@ void Dispatcher::contextProcedure() {
     ++runningContextCount;
     try {
       context.procedure();
-    } catch (std::exception&) {
+    } catch (std::exception& e) {
+      std::cerr << "Exception: " << e.what() << std::endl;
     }
 
     if (context.group != nullptr) {

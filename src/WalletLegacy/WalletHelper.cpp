@@ -6,7 +6,7 @@
 
 #include "WalletHelper.h"
 #include "Common/PathTools.h"
-
+#include <iostream>
 #include <fstream>
 #include <boost/filesystem.hpp>
 

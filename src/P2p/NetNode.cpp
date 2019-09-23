@@ -8,7 +8,7 @@
 
 #include <algorithm>
 #include <fstream>
-
+#include <iostream>
 #include <boost/foreach.hpp>
 #include <boost/uuid/random_generator.hpp>
 #include <boost/uuid/uuid_io.hpp>
@@ -286,7 +286,8 @@ namespace CryptoNote
           CryptoNote::serialize(*this, a);
           loaded = true;
         }
-      } catch (std::exception&) {
+      } catch (std::exception& e) {
+        std::cerr << "Exception: " << e.what() << std::endl;
       }
 
       if (!loaded) {

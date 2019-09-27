@@ -197,6 +197,7 @@ protected:
     const std::string& extra,
     uint64_t unlockTimestamp,
     const DonationSettings& donation,
+    uint64_t ttl,    
     const CryptoNote::AccountPublicAddress& changeDestinationAddress,
     PreparedTransaction& preparedTransaction,
     Crypto::SecretKey& transactionSK);

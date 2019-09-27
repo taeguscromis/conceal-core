@@ -106,6 +106,7 @@ struct TransactionParameters {
   std::string extra;
   uint64_t unlockTimestamp = 0;
   DonationSettings donation;
+  uint64_t ttl;
   std::string changeDestination;
 };
 

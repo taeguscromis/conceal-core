@@ -1309,6 +1309,11 @@ std::unique_ptr<CryptoNote::ITransaction> WalletGreen::makeTransaction(const std
     tx->appendExtra(ba);
   }
 
+   /* Add the TTL to Extra */
+  BinaryArray ba2;
+  appendTTLToExtra(ba2, 120);
+  tx->appendExtra(ba2);
+
   typedef std::pair<const AccountPublicAddress*, uint64_t> AmountToAddress;
   std::vector<AmountToAddress> amountsToAddresses;
   for (const auto& output: decomposedOutputs) {

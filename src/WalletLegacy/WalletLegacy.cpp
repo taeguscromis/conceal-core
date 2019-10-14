@@ -235,6 +235,12 @@ void WalletLegacy::initAndLoad(std::istream& source, const std::string& password
   loader.detach();
 }
 
+bool WalletLegacy::checkPassword(std::istream& source, const std::string& password) {
+  m_password = password;
+  WalletLegacySerializer serializer(m_account, m_transactionsCache);
+  return serializer.checkPassword(source, m_password);
+}
+
 void WalletLegacy::initSync() {
   AccountSubscription sub;
   sub.keys = reinterpret_cast<const AccountKeys&>(m_account.getAccountKeys());

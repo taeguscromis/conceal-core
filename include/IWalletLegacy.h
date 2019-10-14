@@ -116,6 +116,7 @@ public:
 
   virtual void initAndGenerate(const std::string& password) = 0;
   virtual void initAndLoad(std::istream& source, const std::string& password) = 0;
+  virtual bool checkPassword(std::istream& source, const std::string& password) = 0;
   virtual void initWithKeys(const AccountKeys& accountKeys, const std::string& password) = 0;
   virtual void shutdown() = 0;
   virtual void reset() = 0;

@@ -47,6 +47,7 @@ public:
 
   virtual void initAndGenerate(const std::string& password) override;
   virtual void initAndLoad(std::istream& source, const std::string& password) override;
+  virtual bool checkPassword(std::istream& source, const std::string& password) override;
   virtual void initWithKeys(const AccountKeys& accountKeys, const std::string& password) override;
   virtual void shutdown() override;
   virtual void reset() override;
